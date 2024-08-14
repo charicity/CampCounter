@@ -223,7 +223,6 @@ def get_A_time(row) -> int:
 def get_A_score(row) -> tuple:
     
     A_time = get_A_time(row)
-    print("get",row,"-->",(1 if A_time!=-1 else 0, max(A_time, 0)))
     return (1 if A_time>0 else 0, A_time if A_time>0 else -A_time)
 
 
