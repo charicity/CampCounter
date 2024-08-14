@@ -3,6 +3,7 @@
 ## 基本信息
 
 [积分规则](./doc/2024%20ACM新生暑假夏令营训练计划.pdf)
+
 [比赛链接](https://hydro.ac/d/hlutacm/contest)
 
 如果有错误，还请指出，谢谢
@@ -13,9 +14,18 @@
 
 使用方式：
 `git clone https://github.com/charicity/Hydro-Camp-Statistic`
+
 `python3 -u "./autochari.py"`
+
+### 配置比赛信息
+
+在list.txt处复制各个比赛的入口链接
+
+在banlist.txt处配置需要忽略的用户
 
 ## todo list
 导出成表格
+
 计算最终奖金
+
 结果排序
