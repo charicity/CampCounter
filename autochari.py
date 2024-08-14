@@ -2,6 +2,7 @@ import requests
 import os
 import time
 import csv
+from functools import cmp_to_key
 
 banlist = set()
 
@@ -128,6 +129,48 @@ def get_info(row) -> str:
         return result
     return result
 
+
+def value_pk(x, y):
+    if x>y:
+        return -1
+    if x<y:
+        return 1
+    return 0
+
+def custom_sort(x, y):
+    if x[0]!=y[0]:
+        return value_pk(x[0], y[0]) 
+    return -value_pk(x[1], y[1]) # smaller is better
+
+
+def award_them(track_list, result_dict):
+    track_list = sorted(track_list, key=cmp_to_key(lambda x, y: custom_sort(x[1],y[1])))
+    cnt = 0
+    for item in track_list:
+        cnt = cnt + 1
+        print(cnt,item)
+
+        if item[0] not in result_dict:
+            result_dict.update({item[0]:0})
+
+        if cnt == 1 and item[1][0] != 0:
+            result_dict[item[0]] += 10
+            continue
+        elif cnt == 2 and item[1][0] != 0:
+            result_dict[item[0]] += 9
+            continue
+        elif cnt==3 and item[1][0] != 0:
+            result_dict[item[0]] += 8
+            continue
+        else:
+            if item[1][0]==0:
+                result_dict[item[0]] += 1
+                continue
+            else:
+                result_dict[item[0]] += 5
+                continue
+
+
 def process_local_csv(file_path, result_dict):
     raw_rows = read_local_csv(file_path)
 
@@ -141,6 +184,7 @@ def process_local_csv(file_path, result_dict):
             continue
         
         A_score = get_A_score(row)
+        # X_score[1] == 0: 未提交
         if hasA(info) and A_score[1] != 0:
             list_A.append((info, A_score))
 
@@ -152,14 +196,19 @@ def process_local_csv(file_path, result_dict):
         if hasC(info) and C_score[1] != 0:
             list_C.append((info, C_score))
     
-    print("list_A=",list_A)
-    print("list_B=",list_B)
-    print("list_C=",list_C)
+    print("list_A=", list_A)
+    print("list_B=", list_B)
+    print("list_C=", list_C)
+    award_them(list_A, result_dict["A"])
+    award_them(list_B, result_dict["B"])
+    award_them(list_C, result_dict["C"])
 
 def get_time_combo(row, column_solved_time, column_punish) -> int:
     solved_time = row[column_solved_time]
     if solved_time == '':
-        return -1
+        if row[column_punish] == '':
+            return 0
+        return -int(row[column_punish])
     solved_time = solved_time.split(":")
 
     min = int(solved_time[0])*60 + int(solved_time[1])
@@ -172,8 +221,10 @@ def get_A_time(row) -> int:
     return get_time_combo(row, column_A_solved_time, column_A_punish)
 
 def get_A_score(row) -> tuple:
+    
     A_time = get_A_time(row)
-    return (1 if A_time!=-1 else 0, max(A_time, 0))
+    print("get",row,"-->",(1 if A_time!=-1 else 0, max(A_time, 0)))
+    return (1 if A_time>0 else 0, A_time if A_time>0 else -A_time)
 
 
 def get_B_time(row) -> int:
@@ -183,7 +234,7 @@ def get_B_time(row) -> int:
 
 def get_B_score(row) -> tuple:
     B_time = get_B_time(row)
-    return (1 if B_time!=-1 else 0, max(B_time, 0))
+    return (1 if B_time>0 else 0, B_time if B_time>0 else -B_time)
 
 
 def get_C_score(row) -> tuple:
@@ -198,8 +249,6 @@ def process_contest(url):
 
     local_file_path = get_local_file_path(url)
     download_from_contest(url)
-
-    result_dict = {"a":dict(),"b":dict(),"c":dict()}
 
     process_local_csv(local_file_path, result_dict)
 
@@ -223,6 +272,8 @@ def read_ban_list():
 if __name__ == "__main__":
     read_ban_list()
     assert os.path.exists("list.txt")
+
+    result_dict = {"A":dict(),"B":dict(),"C":dict()}
     with open("list.txt", "r") as file:
         while True:
             line = file.readline().lstrip().replace('\n','')
@@ -232,4 +283,8 @@ if __name__ == "__main__":
                 continue
 
             process_contest(line)
+
+    print("TRACK A: \n", result_dict["A"])
+    print("TRACK B: \n", result_dict["B"])
+    print("TRACK C: \n", result_dict["C"])
 
