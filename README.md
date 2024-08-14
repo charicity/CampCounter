@@ -24,4 +24,5 @@
 在banlist.txt处配置需要忽略的用户
 
 ## todo list
-导出成表格
+
+none

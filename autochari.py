@@ -148,7 +148,6 @@ def award_them(track_list, result_dict):
     cnt = 0
     for item in track_list:
         cnt = cnt + 1
-        print(cnt,item)
 
         if item[0] not in result_dict:
             result_dict.update({item[0]:0})
@@ -307,8 +306,14 @@ if __name__ == "__main__":
     print("MONEY:\n", prize)
     print("SORTED:\n",sorted(prize.items(), key=lambda item: item[1]))
 
-    sum=0
-    for name, money in prize.items():
-        sum += money
+    # https://blog.csdn.net/pfm685757/article/details/47806469
+    with open("final_result.csv", "w", newline='', encoding="gbk") as file:
+        writer = csv.writer(file)
+        writer.writerow(["名字","奖金"])
+        sum=0
+        for name, money in prize.items():
+            sum += money
+            writer.writerow([name, money])
+
     print("SUM:", sum)
 
