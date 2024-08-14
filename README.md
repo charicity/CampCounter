@@ -7,7 +7,7 @@
 
 如果有错误，还请指出，谢谢
 
-![image-20240814161546549](./img/README.asserts/image-20240814161546549.png)
+![图片1](./img/README.asserts/%E5%9B%BE%E7%89%871.png)
 
 ## 如何使用
 
