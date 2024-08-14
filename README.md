@@ -13,7 +13,7 @@
 ## 如何使用
 
 使用方式：
-`git clone https://github.com/charicity/Hydro-Camp-Statistic`
+`git clone https://github.com/charicity/CampCounter`
 
 `python3 -u "./autochari.py"`
 
