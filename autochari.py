@@ -171,6 +171,18 @@ def award_them(track_list, result_dict):
                 continue
 
 
+def money_calc(result_dict, track_dict, pool):
+    sum = 0
+    for name, score in track_dict.items():
+        sum+=score
+    print(pool,"/",sum,"=",pool/sum)
+
+    for name, score in track_dict.items():
+        if name not in result_dict:
+            result_dict.update({name:0})
+        result_dict[name] += score * pool/sum
+
+
 def process_local_csv(file_path, result_dict):
     raw_rows = read_local_csv(file_path)
 
@@ -286,4 +298,17 @@ if __name__ == "__main__":
     print("TRACK A: \n", result_dict["A"])
     print("TRACK B: \n", result_dict["B"])
     print("TRACK C: \n", result_dict["C"])
+
+    prize = dict()
+    money_calc(prize, result_dict["A"], 1000)
+    money_calc(prize, result_dict["B"], 600)
+    money_calc(prize, result_dict["C"], 400)
+
+    print("MONEY:\n", prize)
+    print("SORTED:\n",sorted(prize.items(), key=lambda item: item[1]))
+
+    sum=0
+    for name, money in prize.items():
+        sum += money
+    print("SUM:", sum)
 
