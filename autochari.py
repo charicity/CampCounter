@@ -3,7 +3,9 @@ import os
 import time
 import csv
 from functools import cmp_to_key
+import sys
 
+overwrite = False
 banlist = set()
 
 def hasA(string) -> bool:
@@ -26,7 +28,7 @@ def is_legit_track(string) -> bool:
         return False
     
     if (not hasA(string) and not hasB(string)) and hasC(string):
-        print("Warning: this guy only has C")
+        # print("Warning: this guy only has C")
         return True
     return True
 
@@ -59,13 +61,16 @@ def extract_track(string) -> str:
     return track # that's good
 
 def download_from_contest(url):
-    print("downloading ", url, end=' ')
     local_file_file = get_local_file_path(url)
     remote_down_path = url + "/export/csv"
+    print("downloading", remote_down_path, "to", local_file_file + "...", end=' ')
 
     if os.path.exists(local_file_file):
-        print("skipped")
-        return
+        if overwrite:
+            print("[overwriting]")
+        else:
+            print("skipped")
+            return
 
     down_res = requests.get(remote_down_path)
     with open(local_file_file,'wb') as file:
@@ -183,6 +188,7 @@ def money_calc(result_dict, track_dict, pool):
 
 
 def process_local_csv(file_path, result_dict):
+    global banlist
     raw_rows = read_local_csv(file_path)
 
     list_A = []
@@ -264,6 +270,7 @@ def process_contest(url):
 
 
 def read_ban_list():
+    global banlist
     print("reading ban list")
     if not os.path.exists("./banlist.txt"):
         print("not existed, skipped")
@@ -279,12 +286,35 @@ def read_ban_list():
             banlist.add(line)
     print("banlist:", banlist)
 
+def show_help():
+    with open("./README.md", "r", encoding='utf-8') as file:
+        print(file.read())
+    exit(0)
+
+def deal_arguments():
+    global overwrite
+    if len(sys.argv) == 1:
+        return
+    
+    for i in range(1, len(sys.argv)):
+        arg = sys.argv[i]
+        if arg in ["-o", "--overwrite"]:
+            overwrite = True
+        elif arg in ["-h", "--help"]:
+            show_help()
+        else:
+            print("argument", arg, "is not supported")
+            exit(1)
+
 if __name__ == "__main__":
+    print("TIP: using `-h` argument for help")
+    deal_arguments()
     read_ban_list()
     assert os.path.exists("list.txt")
+    print("overwrite =",overwrite)
 
     result_dict = {"A":dict(),"B":dict(),"C":dict()}
-    with open("list.txt", "r") as file:
+    with open("list.txt", "r", encoding='utf-8') as file:
         while True:
             line = file.readline().lstrip().replace('\n','')
             if not line:

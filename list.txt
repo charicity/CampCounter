@@ -12,3 +12,4 @@ https://hydro.ac/d/hlutacm/contest/66b731e8b2af6c067b4d42d7
 https://hydro.ac/d/hlutacm/contest/66b8bf27df4520012085a5e8
 https://hydro.ac/d/hlutacm/contest/66b9f1d368280c47836b6313
 https://hydro.ac/d/hlutacm/contest/66bc101b1796fa54a39e8e6e
+#不能有空行
