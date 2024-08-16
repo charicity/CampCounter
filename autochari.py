@@ -155,36 +155,36 @@ def award_them(track_list, result_dict):
         cnt = cnt + 1
 
         if item[0] not in result_dict:
-            result_dict.update({item[0]:0})
+            result_dict.update({item[0]:[0, item[2]]})
 
         if cnt == 1 and item[1][0] != 0:
-            result_dict[item[0]] += 10
+            result_dict[item[0]][0] += 10
             continue
         elif cnt == 2 and item[1][0] != 0:
-            result_dict[item[0]] += 9
+            result_dict[item[0]][0] += 9
             continue
         elif cnt==3 and item[1][0] != 0:
-            result_dict[item[0]] += 8
+            result_dict[item[0]][0] += 8
             continue
         else:
             if item[1][0]==0:
-                result_dict[item[0]] += 1
+                result_dict[item[0]][0] += 1
                 continue
             else:
-                result_dict[item[0]] += 5
+                result_dict[item[0]][0] += 5
                 continue
 
 
 def money_calc(result_dict, track_dict, pool):
     sum = 0
-    for name, score in track_dict.items():
+    for name, [score, nick] in track_dict.items():
         sum+=score
     print(pool,"/",sum,"=",pool/sum)
 
-    for name, score in track_dict.items():
+    for name, [score, nick] in track_dict.items():
         if name not in result_dict:
-            result_dict.update({name:0})
-        result_dict[name] += score * pool/sum
+            result_dict.update({name:[0, nick]})
+        result_dict[name][0] += score * pool/sum
 
 
 def process_local_csv(file_path, result_dict):
@@ -195,6 +195,7 @@ def process_local_csv(file_path, result_dict):
     list_B = []
     list_C = []
     for row in raw_rows:
+        column_nick_name = 1
         info = get_info(row)
         print(info,"<---",row)
         if info == '' or info in banlist:
@@ -203,15 +204,15 @@ def process_local_csv(file_path, result_dict):
         A_score = get_A_score(row)
         # X_score[1] == 0: 未提交
         if hasA(info) and A_score[1] != 0:
-            list_A.append((info, A_score))
+            list_A.append((info, A_score, row[column_nick_name]))
 
         B_score = get_B_score(row)
         if hasB(info) and B_score[1] != 0:
-            list_B.append((info, B_score))
+            list_B.append((info, B_score, row[column_nick_name]))
         
         C_score = get_C_score(row)
         if hasC(info) and C_score[1] != 0:
-            list_C.append((info, C_score))
+            list_C.append((info, C_score, row[column_nick_name]))
     
     print("list_A=", list_A)
     print("list_B=", list_B)
@@ -334,16 +335,16 @@ if __name__ == "__main__":
     money_calc(prize, result_dict["C"], 400)
 
     print("MONEY:\n", prize)
-    print("SORTED:\n",sorted(prize.items(), key=lambda item: item[1]))
+    print("SORTED:\n",sorted(prize.items(), key=lambda item: item[1][0]))
 
     # https://blog.csdn.net/pfm685757/article/details/47806469
     with open("final_result.csv", "w", newline='', encoding="gbk") as file:
         writer = csv.writer(file)
-        writer.writerow(["名字","奖金"])
+        writer.writerow(["名字","奖金","昵称"])
         sum=0
-        for name, money in prize.items():
+        for name, [money, nick] in prize.items():
             sum += money
-            writer.writerow([name, money])
+            writer.writerow([name, money, nick])
 
     print("SUM:", sum)
 
