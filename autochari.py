@@ -197,7 +197,7 @@ def process_local_csv(file_path, result_dict):
     for row in raw_rows:
         column_nick_name = 1
         info = get_info(row)
-        print(info,"<---",row)
+        # print(info,"<---",row)
         if info == '' or info in banlist:
             continue
         
@@ -214,9 +214,9 @@ def process_local_csv(file_path, result_dict):
         if hasC(info) and C_score[1] != 0:
             list_C.append((info, C_score, row[column_nick_name]))
     
-    print("list_A=", list_A)
-    print("list_B=", list_B)
-    print("list_C=", list_C)
+    # print("list_A=", list_A)
+    # print("list_B=", list_B)
+    # print("list_C=", list_C)
     award_them(list_A, result_dict["A"])
     award_them(list_B, result_dict["B"])
     award_them(list_C, result_dict["C"])
@@ -279,9 +279,13 @@ def read_ban_list():
 
     with open("./banlist.txt", "r", encoding="utf-8") as file:
         while True:
-            line = file.readline().lstrip().replace('\n','')
+            line = file.readline()
             if not line:
                 break
+            if line.lstrip() in ['', '\n', "\r\n"]:
+                continue
+            line = line.lstrip().replace('\n', '')
+
             if line[0] == '#':
                 continue
             banlist.add(line)
@@ -317,17 +321,19 @@ if __name__ == "__main__":
     result_dict = {"A":dict(),"B":dict(),"C":dict()}
     with open("list.txt", "r", encoding='utf-8') as file:
         while True:
-            line = file.readline().lstrip().replace('\n','')
+            line = file.readline()
             if not line:
                 break
+            line = line.lstrip().replace('\n','')
+
             if line[0] == '#':
                 continue
 
             process_contest(line)
 
-    print("TRACK A: \n", result_dict["A"])
-    print("TRACK B: \n", result_dict["B"])
-    print("TRACK C: \n", result_dict["C"])
+    # print("TRACK A: \n", result_dict["A"])
+    # print("TRACK B: \n", result_dict["B"])
+    # print("TRACK C: \n", result_dict["C"])
 
     prize = dict()
     money_calc(prize, result_dict["A"], 1000)
